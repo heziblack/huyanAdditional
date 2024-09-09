@@ -20,7 +20,7 @@ dependencies {
     compileOnly("cn.chahuyun:HuYanAuthorize:1.1.6")
 //    compileOnly("xyz.cssxsh.mirai:mirai-hibernate-plugin:2.8.2")
 //    compileOnly("xyz.cssxsh.mirai:mirai-economy-core:1.06")
-    compileOnly("cn.chahuyun:HuYanEconomy:1.4.8")
+    compileOnly("cn.chahuyun:HuYanEconomy:1.4.10")
     //使用库
     implementation("cn.chahuyun:hibernate-plus:1.0.15")
 }
