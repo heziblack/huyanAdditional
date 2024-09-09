@@ -3,17 +3,12 @@ package icu.heziblack.miraiplugin.chahuyunAdditionalItem
 import cn.chahuyun.authorize.PermissionServer
 import cn.chahuyun.authorize.entity.Perm
 import cn.chahuyun.authorize.utils.PermUtil
-import cn.chahuyun.economy.config.EconomyConfig
-import cn.chahuyun.economy.utils.EconomyUtil
 import cn.chahuyun.hibernateplus.Configuration
 import cn.chahuyun.hibernateplus.DriveType
-import cn.chahuyun.hibernateplus.HibernateFactory as hf
 import cn.chahuyun.hibernateplus.HibernatePlusService
-import entity.TestEntity
 import net.mamoe.mirai.console.plugin.jvm.JvmPluginDescription
 import net.mamoe.mirai.console.plugin.jvm.KotlinPlugin
 import kotlin.io.path.Path
-import kotlin.reflect.KParameter
 
 
 //import cn
@@ -54,10 +49,11 @@ object PluginMain : KotlinPlugin(
     override fun onEnable() {
         // 鉴权初始化注册
         PermissionServer.init(this, "icu.heziblack.miraiplugin.chahuyunAdditionalItem")
-        val p = Perm(PC,"")
-        PermissionServer.registerPermCode(this, p)
-//        val pg = PermUtil.talkPermGroupByName("测试功能")
-//        PermUtil.addPermToPermGroupByName(p,"测试功能")
+        // PC = “test”
+        PermissionServer.registerPermCode(this, Perm(TestGroup,"测试权限-群"))
+        val p = PermUtil.takePerm(TestGroup)
+        val pg = PermUtil.talkPermGroupByName("测试群")
+        PermUtil.addPermToPermGroupByPermGroup(p,pg)
 //        EconomyUtil.init() // 初始化
         val configuration: Configuration = HibernatePlusService.createConfiguration(this::class.java)
         val dataFilePath = Path(this.dataFolderPath.toString(),"data.db3")
