@@ -23,7 +23,7 @@ class TestManager {
             event.sendMessageQuery(tu.addPermAlreadyHas("测试"))
             return
         }
-        if(pu.addUserToPermGroupByName(groupUser,TestGroup)){
+        if(pu.addUserToPermGroupByName(groupUser,"测试群")){
             event.sendMessageQuery(tu.addPermSucceed("测试"))
         }else{
             event.sendMessageQuery(tu.addPermFail("测试"))
@@ -38,6 +38,7 @@ class TestManager {
         val groupUser = User.group(event.group.id)
         if (pu.checkUserHasPerm(groupUser, TestGroup)){
             event.sendMessageQuery(tu.removePermAlreadyLost("测试"))
+            return
         }
         val pg = pu.talkPermGroupByName("测试群")
         pg.users.remove(groupUser)
