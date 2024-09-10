@@ -15,6 +15,8 @@ repositories {
 //    maven ("https://maven.aliyun.com/repository/central")
 }
 
+
+val exposedVersion = "0.54.0"
 dependencies {
     //依赖
     compileOnly("cn.chahuyun:HuYanAuthorize:1.1.6")
@@ -23,6 +25,17 @@ dependencies {
     compileOnly("cn.chahuyun:HuYanEconomy:1.4.10")
     //使用库
     implementation("cn.chahuyun:hibernate-plus:1.0.15")
+    // 使用Exposed的相关库
+    implementation("org.jetbrains.exposed:exposed-core:$exposedVersion")
+    implementation("org.jetbrains.exposed:exposed-dao:$exposedVersion")
+    implementation("org.jetbrains.exposed:exposed-jdbc:$exposedVersion")
+    implementation("org.jetbrains.exposed:exposed-kotlin-datetime:$exposedVersion")
+    implementation("org.jetbrains.exposed:exposed-json:$exposedVersion")
+    implementation("org.jetbrains.exposed:exposed-money:$exposedVersion")
+
+    // https://mvnrepository.com/artifact/org.xerial/sqlite-jdbc
+    implementation("org.xerial:sqlite-jdbc:3.46.1.0")
+
 }
 
 // hibernate 6 和 HikariCP 5 需要 jdk11

@@ -6,6 +6,7 @@ import cn.chahuyun.authorize.utils.PermUtil
 import cn.chahuyun.hibernateplus.Configuration
 import cn.chahuyun.hibernateplus.DriveType
 import cn.chahuyun.hibernateplus.HibernatePlusService
+import icu.heziblack.miraiplugin.chahuyunAdditionalItem.util.DatabaseHelper
 import net.mamoe.mirai.console.plugin.jvm.JvmPluginDescription
 import net.mamoe.mirai.console.plugin.jvm.KotlinPlugin
 import kotlin.io.path.Path
@@ -64,6 +65,13 @@ object PluginMain : KotlinPlugin(
         configuration.password = "123456"
         HibernatePlusService.loadingService(configuration)
         logger.info("附加数据存储位置:${dataFilePath}")
+
+        //测试创建连接数据库
+        logger.debug(DatabaseHelper.dbUrl())
+        logger.debug("备份结果：${DatabaseHelper.backupDataFile()}")
+        DatabaseHelper.setLocation(dataFolder)
+        logger.debug(DatabaseHelper.dbUrl())
+        logger.debug("备份结果：${DatabaseHelper.backupDataFile()}")
 //        val origin:TestEntity = TestEntity("张三")
 
     }
