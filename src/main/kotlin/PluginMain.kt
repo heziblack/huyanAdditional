@@ -6,6 +6,7 @@ import cn.chahuyun.authorize.utils.PermUtil
 import cn.chahuyun.hibernateplus.Configuration
 import cn.chahuyun.hibernateplus.DriveType
 import cn.chahuyun.hibernateplus.HibernatePlusService
+import icu.heziblack.miraiplugin.chahuyunAdditionalItem.manager.CUSTOM_PERMS
 import icu.heziblack.miraiplugin.chahuyunAdditionalItem.util.DatabaseHelper
 import net.mamoe.mirai.console.plugin.jvm.JvmPluginDescription
 import net.mamoe.mirai.console.plugin.jvm.KotlinPlugin
@@ -48,14 +49,10 @@ object PluginMain : KotlinPlugin(
     }
 ) {
     override fun onEnable() {
-        // 鉴权初始化注册
-        PermissionServer.init(this, "icu.heziblack.miraiplugin.chahuyunAdditionalItem")
-        // PC = “test”
-        PermissionServer.registerPermCode(this, Perm(TestGroup,"测试权限-群"))
-        val p = PermUtil.takePerm(TestGroup)
-        val pg = PermUtil.talkPermGroupByName("测试群")
-        PermUtil.addPermToPermGroupByPermGroup(p,pg)
-//        EconomyUtil.init() // 初始化
+        logger.debug("====初始化鉴权====")
+        registerCustomPerm()
+        logger.debug("==初始化鉴权完成==")
+
         val configuration: Configuration = HibernatePlusService.createConfiguration(this::class.java)
         val dataFilePath = Path(this.dataFolderPath.toString(),"data.db3")
         configuration.driveType = DriveType.SQLITE
@@ -67,12 +64,21 @@ object PluginMain : KotlinPlugin(
         logger.info("附加数据存储位置:${dataFilePath}")
 
         //测试创建连接数据库
-        logger.debug(DatabaseHelper.dbUrl())
-        logger.debug("备份结果：${DatabaseHelper.backupDataFile()}")
         DatabaseHelper.setLocation(dataFolder)
         logger.debug(DatabaseHelper.dbUrl())
-        logger.debug("备份结果：${DatabaseHelper.backupDataFile()}")
-//        val origin:TestEntity = TestEntity("张三")
+    }
 
+    /**初始化鉴权并注册自定义权限*/
+    private fun registerCustomPerm(){
+        PermissionServer.init(this, "icu.heziblack.miraiplugin.chahuyunAdditionalItem")
+        for (custom in CUSTOM_PERMS){
+            PermissionServer.registerPermCode(this, custom.value)
+            // 从数据库之中获取刚刚注册的权限实体
+            val p = PermUtil.takePerm(custom.value.code!!)
+            // 注册获取权限组
+            val pg = PermUtil.talkPermGroupByName(custom.key)
+            // 将权限绑定到权限组
+            PermUtil.addPermToPermGroupByPermGroup(p,pg)
+        }
     }
 }

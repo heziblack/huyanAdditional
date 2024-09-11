@@ -1,31 +1,27 @@
 package icu.heziblack.miraiplugin.chahuyunAdditionalItem.util
 
-
+import cn.chahuyun.economy.manager.UserManager
+import icu.heziblack.miraiplugin.chahuyunAdditionalItem.entity.dao.Player
+import icu.heziblack.miraiplugin.chahuyunAdditionalItem.entity.table.Players
+import net.mamoe.mirai.contact.User
+import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.transactions.transaction
 import java.io.File
 import java.nio.file.Files
-import java.nio.file.Path
 import java.nio.file.StandardCopyOption
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import kotlin.io.path.Path
-import kotlin.io.path.exists
 
 
 object DatabaseHelper {
-    private val fileName = "test2.db3"
+    private val fileName = "save.db3"
     private var fileLocation: File = Path(fileName).toFile()
-    private val db by lazy {
-        Database.connect("jdbc:sqlite:${fileLocation.path}","org.sqlite.JDBC")
-    }
-    init {
-        transaction(db){
 
-        }
-    }
+    /**获取数据库连接*/
     fun dbUrl():String{
-        return db.url
+        return getDatabase().url
     }
     /**
      * 备份数据库文件
@@ -36,7 +32,8 @@ object DatabaseHelper {
                 if (fileLocation.isFile) {
                     val from = fileLocation
                     val timeStamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yy-MM-dd--hhmmss"))
-                    val to = File("${fileName}-${timeStamp}.backup")
+                    val folder = from.parentFile
+                    val to = File(folder,"${fileName}-${timeStamp}.backup")
                     Files.copy(from.toPath(),to.toPath(),StandardCopyOption.REPLACE_EXISTING)
                 }
             }else{
@@ -48,7 +45,27 @@ object DatabaseHelper {
         }
     }
 
+    /**设置数据库文件位置*/
     fun setLocation(folder:File){
         fileLocation = File(folder, fileName)
+    }
+
+    /**获取数据库连接位置*/
+    private fun getDatabase():Database{
+        return Database.connect("jdbc:sqlite:${fileLocation.path}","org.sqlite.JDBC")
+    }
+    /**查询创建玩家*/
+    fun talkPlayer(user: User): Player {
+        val userInfo = UserManager.getUserInfo(user)
+        transaction(getDatabase()) {
+            Player.new(id = userInfo.id.toInt().toUInt()) {
+
+            }
+//            val newID = pla
+//            val player = Player.new(id) {
+//
+//            }
+        }
+        TODO()
     }
 }
