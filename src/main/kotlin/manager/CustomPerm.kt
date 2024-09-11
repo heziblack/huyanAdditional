@@ -1,7 +1,6 @@
 package icu.heziblack.miraiplugin.chahuyunAdditionalItem.manager
 
 import cn.chahuyun.authorize.entity.Perm
-import cn.chahuyun.authorize.entity.PermGroup
 
 /**自定义的权限列表
  *

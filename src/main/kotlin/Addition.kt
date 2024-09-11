@@ -5,6 +5,8 @@ import cn.chahuyun.authorize.MessageAuthorize
 import cn.chahuyun.authorize.constant.PermConstant
 import cn.chahuyun.authorize.entity.User
 import cn.chahuyun.authorize.utils.MessageUtil.sendMessageQuery
+import icu.heziblack.miraiplugin.chahuyunAdditionalItem.manager.PlayerPropManager
+import icu.heziblack.miraiplugin.chahuyunAdditionalItem.util.DatabaseHelper
 import icu.heziblack.miraiplugin.chahuyunAdditionalItem.util.TextUtil as tu
 import cn.chahuyun.authorize.utils.PermUtil as pu
 import net.mamoe.mirai.event.events.GroupMessageEvent
@@ -49,7 +51,14 @@ class TestManager {
     @MessageAuthorize(text = ["测试"],
         groupPermissions = [TestGroup])
     suspend fun test2(event: GroupMessageEvent) {
-        /*写群聊测试内容*/
+        val p = DatabaseHelper.talkPlayer(event.sender)
+        val sb = StringBuilder("当前属性如下：\n")
+        sb.append("""
+            |HP:${p.hp}/${p.hpLimit}
+            |FD:${p.food}/${p.foodLimit}
+            |EN:${p.energy}/${p.energyLimit}
+        """.trimMargin())
+        event.sendMessageQuery(sb.toString())
     }
 }
 

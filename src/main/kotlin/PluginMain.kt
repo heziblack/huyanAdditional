@@ -65,6 +65,7 @@ object PluginMain : KotlinPlugin(
 
         //测试创建连接数据库
         DatabaseHelper.setLocation(dataFolder)
+        DatabaseHelper
         logger.debug(DatabaseHelper.dbUrl())
     }
 

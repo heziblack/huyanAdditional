@@ -6,6 +6,8 @@ import icu.heziblack.miraiplugin.chahuyunAdditionalItem.entity.table.Players
 import net.mamoe.mirai.contact.User
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.sql.Database
+import org.jetbrains.exposed.sql.SchemaUtils
+import org.jetbrains.exposed.sql.Table
 import org.jetbrains.exposed.sql.transactions.transaction
 import java.io.File
 import java.nio.file.Files
@@ -48,6 +50,7 @@ object DatabaseHelper {
     /**设置数据库文件位置*/
     fun setLocation(folder:File){
         fileLocation = File(folder, fileName)
+        initDatabase()
     }
 
     /**获取数据库连接位置*/
@@ -57,15 +60,24 @@ object DatabaseHelper {
     /**查询创建玩家*/
     fun talkPlayer(user: User): Player {
         val userInfo = UserManager.getUserInfo(user)
-        transaction(getDatabase()) {
-            Player.new(id = userInfo.id.toInt().toUInt()) {
-
-            }
-//            val newID = pla
-//            val player = Player.new(id) {
-//
-//            }
+        return transaction(getDatabase()) {
+            Player.new(id = userInfo.qq.toULong()){}
         }
-        TODO()
     }
+
+    private fun initDatabase(){
+        transaction(getDatabase()) {
+            SchemaUtils.create(Players)
+        }
+    }
+
+    fun <T: Table> createTable(table:T){
+        transaction {
+            SchemaUtils.create(table)
+        }
+    }
+
+
+
+
 }

@@ -7,8 +7,8 @@ import org.jetbrains.exposed.sql.Column
 const val DefaultBasePropValue:Double = 100.0
 const val DefaultAdvPropValue:Double = 1.0
 const val DefaultRecordValue:UInt = 0u
-object Players: IdTable<UInt>() {
-    override val id: Column<EntityID<UInt>> = uinteger("player_id").entityId()
+object Players: IdTable<ULong>() {
+    override val id: Column<EntityID<ULong>> = ulong("player_id").entityId()
     // PlayerBaseProps
     val hp = double("hp").default(DefaultBasePropValue)
     val hpLimit = double("hp_l").default(DefaultBasePropValue)

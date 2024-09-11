@@ -35,5 +35,7 @@ suspend fun main() {
 //    }.alsoLogin()
 //
 //    MiraiConsole.job.join()
-    val a = LocalDateTime.now()
+    val s = 1220541730L
+    val i = s.toUInt()
+    println(i)
 }

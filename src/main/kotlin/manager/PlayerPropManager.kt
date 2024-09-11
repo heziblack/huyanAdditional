@@ -7,8 +7,8 @@ import icu.heziblack.miraiplugin.chahuyunAdditionalItem.util.DatabaseHelper as d
 
 @EventComponent
 class PlayerPropManager {
-    /**获取或创建Player*/
-    fun talkPlayer(user: User): Player {
-        return dHelper.talkPlayer(user)
-    }
+//    /**获取或创建Player*/
+//    fun talkPlayer(user: User): Player {
+//        return dHelper.talkPlayer(user)
+//    }
 }

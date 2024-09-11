@@ -5,8 +5,8 @@ import org.jetbrains.exposed.dao.Entity
 import org.jetbrains.exposed.dao.EntityClass
 import org.jetbrains.exposed.dao.id.EntityID
 
-class Player(id:EntityID<UInt>):Entity<UInt>(id) {
-    companion object: EntityClass<UInt,Player>(Players)
+class Player(id:EntityID<ULong>):Entity<ULong>(id) {
+    companion object: EntityClass<ULong,Player>(Players)
 
     var hp by Players.hp
     var hpLimit by Players.hpLimit
