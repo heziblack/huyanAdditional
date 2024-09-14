@@ -65,19 +65,10 @@ object DatabaseHelper {
         }
     }
 
+    /**对数据库进行初始化*/
     private fun initDatabase(){
         transaction(getDatabase()) {
-            SchemaUtils.create(Players)
+            SchemaUtils.createMissingTablesAndColumns(Players)
         }
     }
-
-    fun <T: Table> createTable(table:T){
-        transaction {
-            SchemaUtils.create(table)
-        }
-    }
-
-
-
-
 }

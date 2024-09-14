@@ -5,6 +5,8 @@ import org.jetbrains.exposed.dao.Entity
 import org.jetbrains.exposed.dao.EntityClass
 import org.jetbrains.exposed.dao.id.EntityID
 
+
+// 需要一个机制对玩家属性进行刷新和判定
 class Player(id:EntityID<ULong>):Entity<ULong>(id) {
     companion object: EntityClass<ULong,Player>(Players)
 
