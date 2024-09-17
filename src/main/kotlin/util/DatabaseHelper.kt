@@ -2,6 +2,7 @@ package icu.heziblack.miraiplugin.chahuyunAdditionalItem.util
 
 import cn.chahuyun.economy.manager.UserManager
 import icu.heziblack.miraiplugin.chahuyunAdditionalItem.entity.dao.Player
+import icu.heziblack.miraiplugin.chahuyunAdditionalItem.entity.table.PlayerUpdates
 import icu.heziblack.miraiplugin.chahuyunAdditionalItem.entity.table.Players
 import net.mamoe.mirai.contact.User
 import org.jetbrains.exposed.dao.id.EntityID
@@ -9,6 +10,7 @@ import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.SchemaUtils
 import org.jetbrains.exposed.sql.Table
 import org.jetbrains.exposed.sql.transactions.transaction
+import org.jetbrains.exposed.sql.update
 import java.io.File
 import java.nio.file.Files
 import java.nio.file.StandardCopyOption
@@ -46,29 +48,51 @@ object DatabaseHelper {
             throw e
         }
     }
-
     /**设置数据库文件位置*/
     fun setLocation(folder:File){
         fileLocation = File(folder, fileName)
         initDatabase()
     }
-
     /**获取数据库连接位置*/
     private fun getDatabase():Database{
         return Database.connect("jdbc:sqlite:${fileLocation.path}","org.sqlite.JDBC")
     }
-    /**查询创建玩家*/
+    /**查询创建玩家，通过用户对象*/
     fun talkPlayer(user: User): Player {
         val userInfo = UserManager.getUserInfo(user)
+        val uid = userInfo.qq.toULong()
+        return talkPlayer(uid)
+    }
+    /**查询创建玩家，通过ULong*/
+    fun talkPlayer(userID:ULong):Player{
         return transaction(getDatabase()) {
-            Player.new(id = userInfo.qq.toULong()){}
+            Player.findById(userID)?:Player.new(userID){}
         }
     }
-
+    /**查询创建玩家，通过Long*/
+    fun talkPlayer(playerID:Long):Player{
+        return talkPlayer(playerID.toULong())
+    }
+    /**更新玩家数据*/
+    fun updatePlayer(id:ULong){
+        transaction(getDatabase()){
+            Player.findByIdAndUpdate(id){
+                it.hp -= 50.0
+                // TODO 没有做完仍在测试
+            }
+        }
+    }
     /**对数据库进行初始化*/
     private fun initDatabase(){
         transaction(getDatabase()) {
-            SchemaUtils.createMissingTablesAndColumns(Players)
+            SchemaUtils.createMissingTablesAndColumns(Players,PlayerUpdates)
         }
     }
+    /**获取玩家数据操作时间*/
+    fun playerTimestamp(uid:Long):LocalDateTime{
+        transaction(getDatabase()){
+            TODO()
+        }
+    }
+
 }

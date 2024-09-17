@@ -7,9 +7,15 @@ import cn.chahuyun.hibernateplus.Configuration
 import cn.chahuyun.hibernateplus.DriveType
 import cn.chahuyun.hibernateplus.HibernatePlusService
 import icu.heziblack.miraiplugin.chahuyunAdditionalItem.manager.CUSTOM_PERMS
+import icu.heziblack.miraiplugin.chahuyunAdditionalItem.service.PlayerPropsManageService
 import icu.heziblack.miraiplugin.chahuyunAdditionalItem.util.DatabaseHelper
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import net.mamoe.mirai.console.plugin.jvm.JvmPluginDescription
 import net.mamoe.mirai.console.plugin.jvm.KotlinPlugin
+import java.util.*
+import java.util.concurrent.Executors
+import java.util.concurrent.TimeUnit
 import kotlin.io.path.Path
 
 
@@ -67,7 +73,18 @@ object PluginMain : KotlinPlugin(
         DatabaseHelper.setLocation(dataFolder)
         DatabaseHelper
         logger.debug(DatabaseHelper.dbUrl())
+        val self = this
+//        logger
+//        this.launch {
+//
+//
+//        }
+        val playerPropsManageService = PlayerPropsManageService(self.logger)
+        playerPropsManageService.ready()
+        scheduler.scheduleAtFixedRate(playerPropsManageService,5, 60, TimeUnit.SECONDS)
     }
+
+    private val scheduler = Executors.newSingleThreadScheduledExecutor()
 
     /**初始化鉴权并注册自定义权限*/
     private fun registerCustomPerm(){

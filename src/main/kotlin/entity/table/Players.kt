@@ -4,9 +4,7 @@ import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.dao.id.IdTable
 import org.jetbrains.exposed.sql.Column
 
-const val DefaultBasePropValue:Double = 100.0
-const val DefaultAdvPropValue:Double = 1.0
-const val DefaultRecordValue:UInt = 0u
+
 object Players: IdTable<ULong>() {
     override val id: Column<EntityID<ULong>> = ulong("player_id").entityId()
     // PlayerBaseProps
@@ -25,4 +23,6 @@ object Players: IdTable<ULong>() {
     val eat = uinteger("eat").default(DefaultRecordValue)
     val rob = uinteger("rob").default(DefaultRecordValue)
     val craft = uinteger("craft").default(DefaultRecordValue)
+    // flag
+    val onRemake = bool("on_remake").default(false)
 }

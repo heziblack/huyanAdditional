@@ -25,4 +25,6 @@ class Player(id:EntityID<ULong>):Entity<ULong>(id) {
     var eat by Players.eat
     var rob by Players.rob
     var craft by Players.craft
+
+    var onRemake by Players.onRemake
 }
