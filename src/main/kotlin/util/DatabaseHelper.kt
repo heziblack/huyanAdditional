@@ -121,6 +121,19 @@ object DatabaseHelper {
         // 返回更新数据后的玩家对象
         return talkPlayer(player.id.value)
     }
+    /**使用递归来更新玩家数据
+     *
+     * 调用此方法前必须保证[Player]和[PlayerUpdate]数据存在*/
+    private fun newUpdate(player: Player,leftTime:Long){
+        if (leftTime<=0) return
+        // TODO 递归单次计算玩家数据更新
+        transaction(getDatabase()) {
+            // 重新查询玩家数据，以防万一
+            val newPlayer = Player.findById(player.id.value)?: talkPlayer(player.id.value)
+
+        }
+        newUpdate(player, leftTime-1)
+    }
 
     /**对数据库进行初始化*/
     private fun initDatabase(){
