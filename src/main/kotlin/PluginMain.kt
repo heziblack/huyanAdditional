@@ -79,7 +79,8 @@ object PluginMain : KotlinPlugin(
 
     /**初始化鉴权并注册自定义权限*/
     private fun registerCustomPerm(){
-        PermissionServer.init(this, "icu.heziblack.miraiplugin.chahuyunAdditionalItem")
+//        PermissionServer.init(this, "icu.heziblack.miraiplugin.chahuyunAdditionalItem")
+        PermissionServer.registerMessageEvent(this, "icu.heziblack.miraiplugin.chahuyunAdditionalItem")
         for (custom in CUSTOM_PERMS){
             PermissionServer.registerPermCode(this, custom.value)
             // 从数据库之中获取刚刚注册的权限实体

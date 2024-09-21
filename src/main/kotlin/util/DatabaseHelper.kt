@@ -123,16 +123,25 @@ object DatabaseHelper {
     }
     /**使用递归来更新玩家数据
      *
-     * 调用此方法前必须保证[Player]和[PlayerUpdate]数据存在*/
-    private fun newUpdate(player: Player,leftTime:Long){
+     * 调用此方法前必须保证[Player]和[PlayerUpdate]数据存在
+     *
+     * @param playerID 玩家ID，用于查询玩家对象，每次递归计算通过其重新获取玩家
+     * @param leftTime 剩余循环次数 */
+    private fun newUpdate(playerID:ULong, leftTime:Long){
+        // 若次数耗尽结束递归
         if (leftTime<=0) return
-        // TODO 递归单次计算玩家数据更新
-        transaction(getDatabase()) {
-            // 重新查询玩家数据，以防万一
-            val newPlayer = Player.findById(player.id.value)?: talkPlayer(player.id.value)
 
+        val result =  transaction(getDatabase()) {
+            // 重新查询玩家数据，以防万一
+            val newPlayer = Player.findById(playerID)?: talkPlayer(playerID)
+            // 检查、修改玩家食物属性
+            // 若饱食度<=0.0，开始扣除心情、生命、能量
+            // 当生命值归零，将玩家reMake标志置True
+            // TODO
+            newPlayer
         }
-        newUpdate(player, leftTime-1)
+        // 若生命值没有耗尽继续递归
+        if (!result.onRemake) newUpdate(playerID,leftTime-1)
     }
 
     /**对数据库进行初始化*/

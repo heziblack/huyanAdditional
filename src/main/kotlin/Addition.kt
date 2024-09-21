@@ -2,10 +2,10 @@ package icu.heziblack.miraiplugin.chahuyunAdditionalItem
 
 import cn.chahuyun.authorize.EventComponent
 import cn.chahuyun.authorize.MessageAuthorize
+import cn.chahuyun.authorize.constant.AuthPerm
 import cn.chahuyun.authorize.constant.MessageMatchingEnum
-import cn.chahuyun.authorize.constant.PermConstant
-import cn.chahuyun.authorize.entity.User
 import cn.chahuyun.authorize.utils.MessageUtil.sendMessageQuery
+import cn.chahuyun.authorize.utils.UserUtil
 import icu.heziblack.miraiplugin.chahuyunAdditionalItem.command.CustomCheck
 import icu.heziblack.miraiplugin.chahuyunAdditionalItem.util.DatabaseHelper
 import icu.heziblack.miraiplugin.chahuyunAdditionalItem.util.TextUtil as tu
@@ -21,10 +21,10 @@ class TestManager {
     }
     @MessageAuthorize(
         text = ["开启 测试"],
-        userPermissions = [PermConstant.OWNER],
+        userPermissions = [AuthPerm.OWNER],
     )
     suspend fun testOn(event: GroupMessageEvent) {
-        val groupUser = User.group(event.group.id)
+        val groupUser = UserUtil.group(event.group.id)
         if (pu.checkUserHasPerm(groupUser, TEST_GROUP)){
             event.sendMessageQuery(tu.addPermAlreadyHas("测试"))
             return
@@ -38,10 +38,10 @@ class TestManager {
 
     @MessageAuthorize(
         text = ["关闭 测试"],
-        userPermissions = [PermConstant.OWNER],
+        userPermissions = [AuthPerm.OWNER],
     )
     suspend fun testOff(event: GroupMessageEvent) {
-        val groupUser = User.group(event.group.id)
+        val groupUser = UserUtil.group(event.group.id)
         if (!pu.checkUserHasPerm(groupUser, TEST_GROUP)){
             event.sendMessageQuery(tu.removePermAlreadyLost("测试"))
             return
