@@ -54,7 +54,7 @@ class TestManager {
 
     @MessageAuthorize(
 //        text = ["测试"],
-        groupPermissions = [TEST_GROUP],
+        groupPermissions = [TEST_GROUP, AuthPerm.OWNER, AuthPerm.ADMIN],
         custom = CustomCheck::class,
         messageMatching = MessageMatchingEnum.CUSTOM,
         )

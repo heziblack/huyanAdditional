@@ -25,6 +25,7 @@ import kotlin.io.path.Path
 object DatabaseHelper {
     private val fileName = "save.db3"
     private var fileLocation: File = Path(fileName).toFile()
+    private const val FOOD_DEVALUE:Double = 0.35
 
     /**获取数据库连接*/
     fun dbUrl():String{
@@ -135,13 +136,58 @@ object DatabaseHelper {
             // 重新查询玩家数据，以防万一
             val newPlayer = Player.findById(playerID)?: talkPlayer(playerID)
             // 检查、修改玩家食物属性
-            // 若饱食度<=0.0，开始扣除心情、生命、能量
+            if (newPlayer.food > 0.0){
+                if (newPlayer.food > FOOD_DEVALUE){
+                    newPlayer.food -= FOOD_DEVALUE
+                }else{
+                    newPlayer.food = 0.0
+                }
+            }else{
+                // 若饱食度<=0.0，开始扣除心情、生命、能量
+                if (newPlayer.hp > 0.0){
+                    // 根据玩家心情值决定要扣除的HP值
+                    val decValue = hpDecReferHappy(newPlayer.happiness)
+                    when(newPlayer.hp){
+                        in (- 1.0 .. decValue) ->{
+                            TODO()
+                        }
+                        else -> {
+                            newPlayer.hp -= decValue
+                        }
+                    }
+                }else{
+                    // HP都没了，重开
+                    newPlayer.onRemake = true
+                }
+            }
+
             // 当生命值归零，将玩家reMake标志置True
             // TODO
             newPlayer
         }
         // 若生命值没有耗尽继续递归
         if (!result.onRemake) newUpdate(playerID,leftTime-1)
+    }
+
+    /**根据[happiness]分段决定扣除的hp值*/
+    private fun hpDecReferHappy(happiness:Double):Double{
+        return when(happiness){
+            in (0.0 .. 0.3) -> {
+                TODO()
+            }
+            in (0.3 .. 0.5) -> {
+                TODO()
+            }
+            in (0.5 .. 0.8) -> {
+                TODO()
+            }
+            in (0.8 .. 1.0) -> {
+                TODO()
+            }
+            else ->{
+                TODO()
+            }
+        }
     }
 
     /**对数据库进行初始化*/
