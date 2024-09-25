@@ -13,7 +13,6 @@ import cn.chahuyun.authorize.utils.PermUtil as pu
 import net.mamoe.mirai.event.events.GroupMessageEvent
 
 /**相关权限*/
-
 @EventComponent
 class TestManager {
     companion object{

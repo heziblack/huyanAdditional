@@ -6,19 +6,15 @@ import icu.heziblack.miraiplugin.chahuyunAdditionalItem.entity.dao.PlayerUpdate
 import icu.heziblack.miraiplugin.chahuyunAdditionalItem.entity.table.PlayerUpdates
 import icu.heziblack.miraiplugin.chahuyunAdditionalItem.entity.table.Players
 import net.mamoe.mirai.contact.User
-import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.SchemaUtils
-import org.jetbrains.exposed.sql.Table
 import org.jetbrains.exposed.sql.transactions.transaction
-import org.jetbrains.exposed.sql.update
 import java.io.File
 import java.nio.file.Files
 import java.nio.file.StandardCopyOption
 import java.time.Duration
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
-import java.time.temporal.TemporalUnit
 import kotlin.io.path.Path
 
 
@@ -78,50 +74,26 @@ object DatabaseHelper {
         return talkPlayer(playerID.toULong())
     }
     /**更新玩家数据*/
-    fun updatePlayer(id:ULong){
-        transaction(getDatabase()){
+    fun updatePlayer(id:ULong):Player{
+        return transaction(getDatabase()){
             val p = talkPlayer(id)
             val update = playerTimestamp(p)?: createPlayerTimestamp(p)
             val d = Duration.between(getTimeFromUpdate(update.timestamp),LocalDateTime.now())
-            if (d < standDuration){
-                // TODO 由于时间间隔小于更新时间,不对玩家做更新
-            }else{
-                updatePlayer(p,d)
-                talkUpdate(p)
-            }
+            if (d >= standDuration) updatePlayer(p, d) else p
         }
     }
-    /**更新玩家数据，并返回更新后的对象
-     *
-     * 长方法*/
+
+    /**更新玩家数据，并返回更新后的对象*/
     private fun updatePlayer(player: Player,duration: Duration):Player{
-//         TODO 根据玩家时间间隔扣除数据
         val minutes = duration.toMinutes() //分钟数
         val counter = minutes / 5
-        transaction(getDatabase()) {
-            // TODO 扣血逻辑需要再打磨一下
-            var left = counter
-            for (i in 1..counter) {
-                player.food -= 0.35
-                left -= 1
-                if (player.food <= 0) {
-                    player.food = 0.0
-                    player.hp -= 0.4
-                    player.sickness -= 1.0
-                    break
-                }
-            }
-            if (left > 0) {
-                for (i in 1..left) {
-                    player.hp -= 0.4
-                    player.sickness -= 1.0
-                    // TODO 还未做完
-                }
-            }
-        }
+        newUpdate(player.id.value, counter)
+        updatePlayerTimestamp(player)
+
         // 返回更新数据后的玩家对象
         return talkPlayer(player.id.value)
     }
+
     /**使用递归来更新玩家数据
      *
      * 调用此方法前必须保证[Player]和[PlayerUpdate]数据存在
@@ -146,10 +118,13 @@ object DatabaseHelper {
                 // 若饱食度<=0.0，开始扣除心情、生命、能量
                 if (newPlayer.hp > 0.0){
                     // 根据玩家心情值决定要扣除的HP值
+                    formatPlayerHappiness(newPlayer)
                     val decValue = hpDecReferHappy(newPlayer.happiness)
                     when(newPlayer.hp){
                         in (- 1.0 .. decValue) ->{
-                            TODO()
+                            // 玩家生命值不够扣除
+                            newPlayer.hp = 0.0
+                            newPlayer.onRemake = true
                         }
                         else -> {
                             newPlayer.hp -= decValue
@@ -160,9 +135,6 @@ object DatabaseHelper {
                     newPlayer.onRemake = true
                 }
             }
-
-            // 当生命值归零，将玩家reMake标志置True
-            // TODO
             newPlayer
         }
         // 若生命值没有耗尽继续递归
@@ -173,19 +145,31 @@ object DatabaseHelper {
     private fun hpDecReferHappy(happiness:Double):Double{
         return when(happiness){
             in (0.0 .. 0.3) -> {
-                TODO()
+                0.8
             }
             in (0.3 .. 0.5) -> {
-                TODO()
+                0.6
             }
             in (0.5 .. 0.8) -> {
-                TODO()
+                0.4
             }
             in (0.8 .. 1.0) -> {
-                TODO()
+                0.2
             }
             else ->{
-                TODO()
+                0.2
+            }
+        }
+    }
+
+    /**规则化玩家心情,使其值保持在  0~1  */
+    private fun formatPlayerHappiness(player: Player){
+        if(player.happiness in (0.0 .. 1.0)) return
+        transaction(getDatabase()){
+            if (player.happiness>1.0){
+                player.happiness = 1.0
+            }else{
+                player.happiness = 0.001
             }
         }
     }
@@ -196,12 +180,14 @@ object DatabaseHelper {
             SchemaUtils.createMissingTablesAndColumns(Players,PlayerUpdates)
         }
     }
+
     /**获取玩家时间戳*/
     private fun playerTimestamp(player: Player):PlayerUpdate?{
         return transaction(getDatabase()) {
             PlayerUpdate.findById(player.id)
         }
     }
+
     /**创建玩家时间戳*/
     private fun createPlayerTimestamp(player: Player):PlayerUpdate{
         return transaction(getDatabase()) {
@@ -210,22 +196,27 @@ object DatabaseHelper {
             }
         }
     }
+
+    /**获取创建玩家时间戳*/
+    private fun talkPlayerTimestamp(player: Player):PlayerUpdate{
+        return playerTimestamp(player)?: createPlayerTimestamp(player)
+    }
+
     /**更新间隔颗粒度*/
     private val standDuration = Duration.ofMinutes(5L)
+
     /**日期格式化为字符*/
     private val timestampFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("yyMMddhhmmss")
+
     /**从字符串获取时间*/
     private fun getTimeFromUpdate(timestamp:String):LocalDateTime{
         return LocalDateTime.parse(timestamp, timestampFormatter)
     }
-    /**获取创建玩家时间戳*/
-    private fun talkUpdate(player: Player):PlayerUpdate{
-        return playerTimestamp(player)?: createPlayerTimestamp(player)
-    }
 
-    private fun makePlayerUpdate(player: Player){
+    /**更新玩家时间戳*/
+    private fun updatePlayerTimestamp(player: Player){
         transaction(getDatabase()){
-            talkUpdate(player).timestamp = LocalDateTime.now().format(timestampFormatter)
+            talkPlayerTimestamp(player).timestamp = LocalDateTime.now().format(timestampFormatter)
         }
     }
 

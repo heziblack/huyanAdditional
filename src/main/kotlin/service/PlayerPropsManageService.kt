@@ -10,7 +10,9 @@ import net.mamoe.mirai.utils.MiraiLogger
  *
  * 目前的想法是将玩家数据先读取一部分到内存，必要的时候进行存储
  *
- * 暂定行为*/
+ * 暂定行为
+ *
+ * 废弃*/
 class PlayerPropsManageService(private val logger:MiraiLogger):Runnable {
     /** 就绪标志 */
     private var ready = false
