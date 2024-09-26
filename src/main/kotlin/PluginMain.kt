@@ -45,7 +45,7 @@ object PluginMain : KotlinPlugin(
             meme
         """.trimIndent()
         )
-        dependsOn("cn.chahuyun.HuYanEconomy",">=1.4.10",false)
+        dependsOn("cn.chahuyun.HuYanEconomy",">=1.2.0",false)
         dependsOn("cn.chahuyun.HuYanAuthorize",">=1.1.5",false) // 使用依赖  版本需要大于等于 1.1.5 没有依赖将启动失败
         // author 和 info 可以删除.
     }

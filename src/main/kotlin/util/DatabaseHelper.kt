@@ -82,7 +82,6 @@ object DatabaseHelper {
             if (d >= standDuration) updatePlayer(p, d) else p
         }
     }
-
     /**更新玩家数据，并返回更新后的对象*/
     private fun updatePlayer(player: Player,duration: Duration):Player{
         val minutes = duration.toMinutes() //分钟数
@@ -93,7 +92,6 @@ object DatabaseHelper {
         // 返回更新数据后的玩家对象
         return talkPlayer(player.id.value)
     }
-
     /**使用递归来更新玩家数据
      *
      * 调用此方法前必须保证[Player]和[PlayerUpdate]数据存在
@@ -119,6 +117,7 @@ object DatabaseHelper {
                 if (newPlayer.hp > 0.0){
                     // 根据玩家心情值决定要扣除的HP值
                     formatPlayerHappiness(newPlayer)
+                    newPlayer.happiness *= 0.9 // 心情值为原来的0.9
                     val decValue = hpDecReferHappy(newPlayer.happiness)
                     when(newPlayer.hp){
                         in (- 1.0 .. decValue) ->{
@@ -141,7 +140,9 @@ object DatabaseHelper {
         if (!result.onRemake) newUpdate(playerID,leftTime-1)
     }
 
-    /**根据[happiness]分段决定扣除的hp值*/
+    /**根据[happiness]分段决定扣除的hp值
+     *
+     * 未来或许会修改*/
     private fun hpDecReferHappy(happiness:Double):Double{
         return when(happiness){
             in (0.0 .. 0.3) -> {
@@ -206,7 +207,7 @@ object DatabaseHelper {
     private val standDuration = Duration.ofMinutes(5L)
 
     /**日期格式化为字符*/
-    private val timestampFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("yyMMddhhmmss")
+    private val timestampFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("yyMMddHHmmss")
 
     /**从字符串获取时间*/
     private fun getTimeFromUpdate(timestamp:String):LocalDateTime{
@@ -217,8 +218,8 @@ object DatabaseHelper {
     private fun updatePlayerTimestamp(player: Player){
         transaction(getDatabase()){
             talkPlayerTimestamp(player).timestamp = LocalDateTime.now().format(timestampFormatter)
+            println(talkPlayerTimestamp(player).timestamp)
         }
     }
-
 
 }

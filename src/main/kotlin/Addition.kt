@@ -8,9 +8,11 @@ import cn.chahuyun.authorize.utils.MessageUtil.sendMessageQuery
 import cn.chahuyun.authorize.utils.UserUtil
 import icu.heziblack.miraiplugin.chahuyunAdditionalItem.command.CustomCheck
 import icu.heziblack.miraiplugin.chahuyunAdditionalItem.util.DatabaseHelper
+import kotlinx.coroutines.delay
 import icu.heziblack.miraiplugin.chahuyunAdditionalItem.util.TextUtil as tu
 import cn.chahuyun.authorize.utils.PermUtil as pu
 import net.mamoe.mirai.event.events.GroupMessageEvent
+import kotlin.time.Duration
 
 /**相关权限*/
 @EventComponent
@@ -66,6 +68,16 @@ class TestManager {
             |EN:${p.energy}/${p.energyLimit}
         """.trimMargin())
         event.sendMessageQuery(sb.toString())
+        DatabaseHelper.updatePlayer(p.id.value)
+//        delay(Duration.parseIsoString(java.time.Duration.ofMinutes(5).toString()))
+//        val np = DatabaseHelper.talkPlayer(event.sender)
+//        val nsb = StringBuilder("当前属性如下：\n")
+//        sb.append("""
+//            |HP:${np.hp}/${np.hpLimit}
+//            |FD:${np.food}/${np.foodLimit}
+//            |EN:${np.energy}/${np.energyLimit}
+//        """.trimMargin())
+//        event.sendMessageQuery(nsb.toString())
     }
 }
 
