@@ -6,12 +6,14 @@ import cn.chahuyun.authorize.constant.AuthPerm
 import cn.chahuyun.authorize.constant.MessageMatchingEnum
 import cn.chahuyun.authorize.utils.MessageUtil.sendMessageQuery
 import cn.chahuyun.authorize.utils.UserUtil
+import cn.chahuyun.economy.utils.ShareUtils
 import icu.heziblack.miraiplugin.chahuyunAdditionalItem.command.CustomCheck
 import icu.heziblack.miraiplugin.chahuyunAdditionalItem.util.DatabaseHelper
 import kotlinx.coroutines.delay
 import icu.heziblack.miraiplugin.chahuyunAdditionalItem.util.TextUtil as tu
 import cn.chahuyun.authorize.utils.PermUtil as pu
 import net.mamoe.mirai.event.events.GroupMessageEvent
+import java.time.LocalDateTime
 import kotlin.time.Duration
 
 /**相关权限*/
@@ -61,23 +63,19 @@ class TestManager {
         )
     suspend fun test2(event: GroupMessageEvent) {
         val p = DatabaseHelper.talkPlayer(event.sender)
-        val sb = StringBuilder("当前属性如下：\n")
+        val b = DatabaseHelper.talkPlayerTimestamp(p)
+        val np = DatabaseHelper.updatePlayer(p.id.value)
+        val nts = DatabaseHelper.talkPlayerTimestamp(p)
+        val sb = StringBuilder()
         sb.append("""
-            |HP:${p.hp}/${p.hpLimit}
-            |FD:${p.food}/${p.foodLimit}
-            |EN:${p.energy}/${p.energyLimit}
-        """.trimMargin())
+            time:${DatabaseHelper.shorter(b.timestamp)}->${DatabaseHelper.shorter(nts.timestamp)}
+            HP:${ShareUtils.rounding(p.hp)}->${ShareUtils.rounding(np.hp)}
+            FD:${ShareUtils.rounding(p.food)}->${ShareUtils.rounding(np.food)}
+            HA:${ShareUtils.rounding(p.happiness)}->${ShareUtils.rounding(np.happiness)}
+            OR:${p.onRemake}->${np.onRemake}
+        """.trimIndent())
         event.sendMessageQuery(sb.toString())
-        DatabaseHelper.updatePlayer(p.id.value)
-//        delay(Duration.parseIsoString(java.time.Duration.ofMinutes(5).toString()))
-//        val np = DatabaseHelper.talkPlayer(event.sender)
-//        val nsb = StringBuilder("当前属性如下：\n")
-//        sb.append("""
-//            |HP:${np.hp}/${np.hpLimit}
-//            |FD:${np.food}/${np.foodLimit}
-//            |EN:${np.energy}/${np.energyLimit}
-//        """.trimMargin())
-//        event.sendMessageQuery(nsb.toString())
+
     }
 }
 

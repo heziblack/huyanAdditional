@@ -8,7 +8,9 @@ import icu.heziblack.miraiplugin.chahuyunAdditionalItem.entity.table.Players
 import net.mamoe.mirai.contact.User
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.SchemaUtils
+import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.transactions.transaction
+import org.jetbrains.exposed.sql.update
 import java.io.File
 import java.nio.file.Files
 import java.nio.file.StandardCopyOption
@@ -60,7 +62,7 @@ object DatabaseHelper {
     /**查询创建玩家，通过用户对象*/
     fun talkPlayer(user: User): Player {
         val userInfo = UserManager.getUserInfo(user)
-        val uid = userInfo.qq.toULong()
+        val uid = userInfo.qq
         return talkPlayer(uid)
     }
     /**查询创建玩家，通过ULong*/
@@ -87,8 +89,6 @@ object DatabaseHelper {
         val minutes = duration.toMinutes() //分钟数
         val counter = minutes / 5
         newUpdate(player.id.value, counter)
-        updatePlayerTimestamp(player)
-
         // 返回更新数据后的玩家对象
         return talkPlayer(player.id.value)
     }
@@ -136,6 +136,7 @@ object DatabaseHelper {
             }
             newPlayer
         }
+        updatePlayerTimestamp(result)
         // 若生命值没有耗尽继续递归
         if (!result.onRemake) newUpdate(playerID,leftTime-1)
     }
@@ -199,7 +200,7 @@ object DatabaseHelper {
     }
 
     /**获取创建玩家时间戳*/
-    private fun talkPlayerTimestamp(player: Player):PlayerUpdate{
+    fun talkPlayerTimestamp(player: Player):PlayerUpdate{
         return playerTimestamp(player)?: createPlayerTimestamp(player)
     }
 
@@ -218,8 +219,24 @@ object DatabaseHelper {
     private fun updatePlayerTimestamp(player: Player){
         transaction(getDatabase()){
             talkPlayerTimestamp(player).timestamp = LocalDateTime.now().format(timestampFormatter)
-            println(talkPlayerTimestamp(player).timestamp)
         }
     }
 
+    /**获取当前时间时间戳字符串*/
+    fun now():String{
+        return LocalDateTime.now().format(timestampFormatter)
+    }
+
+    fun shorter(timestamp: String):String{
+        return timestamp.substring(2)
+    }
+
+    /**补全玩家数据*/
+    fun fixPlayerData(){
+        transaction(getDatabase()) {
+            for(p in Player.all()){
+                talkPlayerTimestamp(p)
+            }
+        }
+    }
 }

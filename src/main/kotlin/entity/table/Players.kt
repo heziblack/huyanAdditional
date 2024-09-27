@@ -3,6 +3,7 @@ package icu.heziblack.miraiplugin.chahuyunAdditionalItem.entity.table
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.dao.id.IdTable
 import org.jetbrains.exposed.sql.Column
+import org.jetbrains.exposed.sql.and
 
 
 object Players: IdTable<ULong>() {
