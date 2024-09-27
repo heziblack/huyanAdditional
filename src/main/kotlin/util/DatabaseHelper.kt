@@ -24,7 +24,6 @@ object DatabaseHelper {
     private val fileName = "save.db3"
     private var fileLocation: File = Path(fileName).toFile()
     private const val FOOD_DEVALUE:Double = 0.35
-
     /**获取数据库连接*/
     fun dbUrl():String{
         return getDatabase().url
@@ -189,7 +188,6 @@ object DatabaseHelper {
             PlayerUpdate.findById(player.id)
         }
     }
-
     /**创建玩家时间戳*/
     private fun createPlayerTimestamp(player: Player):PlayerUpdate{
         return transaction(getDatabase()) {
@@ -198,39 +196,31 @@ object DatabaseHelper {
             }
         }
     }
-
     /**获取创建玩家时间戳*/
     fun talkPlayerTimestamp(player: Player):PlayerUpdate{
         return playerTimestamp(player)?: createPlayerTimestamp(player)
     }
-
     /**更新间隔颗粒度*/
     private val standDuration = Duration.ofMinutes(5L)
-
     /**日期格式化为字符*/
     private val timestampFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("yyMMddHHmmss")
-
     /**从字符串获取时间*/
     private fun getTimeFromUpdate(timestamp:String):LocalDateTime{
         return LocalDateTime.parse(timestamp, timestampFormatter)
     }
-
     /**更新玩家时间戳*/
     private fun updatePlayerTimestamp(player: Player){
         transaction(getDatabase()){
             talkPlayerTimestamp(player).timestamp = LocalDateTime.now().format(timestampFormatter)
         }
     }
-
     /**获取当前时间时间戳字符串*/
     fun now():String{
         return LocalDateTime.now().format(timestampFormatter)
     }
-
     fun shorter(timestamp: String):String{
         return timestamp.substring(2)
     }
-
     /**补全玩家数据*/
     fun fixPlayerData(){
         transaction(getDatabase()) {

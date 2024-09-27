@@ -67,7 +67,7 @@ object PluginMain : KotlinPlugin(
 
         //测试创建连接数据库
         DatabaseHelper.setLocation(dataFolder)
-        DatabaseHelper
+//        DatabaseHelper.fixPlayerData()
         logger.debug(DatabaseHelper.dbUrl())
 //        val self = this
 //        val playerPropsManageService = PlayerPropsManageService(self.logger)

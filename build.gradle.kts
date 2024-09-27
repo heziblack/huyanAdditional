@@ -22,7 +22,7 @@ dependencies {
     compileOnly("cn.chahuyun:HuYanAuthorize:1.2.0")
 //    compileOnly("xyz.cssxsh.mirai:mirai-hibernate-plugin:2.8.2")
 //    compileOnly("xyz.cssxsh.mirai:mirai-economy-core:1.06")
-    compileOnly("cn.chahuyun:HuYanEconomy:1.5.1")
+    compileOnly("cn.chahuyun:HuYanEconomy:1.6.0")
     //使用库
     implementation("cn.chahuyun:hibernate-plus:1.0.15")
     // 使用Exposed的相关库
