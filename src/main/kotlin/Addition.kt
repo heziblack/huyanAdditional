@@ -65,6 +65,7 @@ class TestManager {
         val p = DatabaseHelper.talkPlayer(event.sender)
         val b = DatabaseHelper.talkPlayerTimestamp(p)
         val np = DatabaseHelper.updatePlayer(p.id.value)
+        DatabaseHelper.updatePlayerTimestamp(p)
         val nts = DatabaseHelper.talkPlayerTimestamp(p)
         val sb = StringBuilder()
         sb.append("""
@@ -75,7 +76,25 @@ class TestManager {
             OR:${p.onRemake}->${np.onRemake}
         """.trimIndent())
         event.sendMessageQuery(sb.toString())
-
     }
+
+    @MessageAuthorize(
+        text = ["sjc"],
+        groupPermissions = [TEST_GROUP, AuthPerm.OWNER, AuthPerm.ADMIN],
+//        custom = CustomCheck::class,
+//        messageMatching = MessageMatchingEnum.CUSTOM,
+    )
+    suspend fun test3(event: GroupMessageEvent) {
+        val p = DatabaseHelper.talkPlayer(event.sender)
+        val b = DatabaseHelper.talkPlayerTimestamp(p)
+        val np = DatabaseHelper.updatePlayer(p.id.value)
+//        DatabaseHelper.updateTimestamp(b)
+        val sb = StringBuilder()
+        sb.append("""
+            time:${DatabaseHelper.shorter(b.timestamp)}
+        """.trimIndent())
+        event.sendMessageQuery(sb.toString())
+    }
+
 }
 

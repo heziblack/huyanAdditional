@@ -78,9 +78,14 @@ object DatabaseHelper {
     fun updatePlayer(id:ULong):Player{
         return transaction(getDatabase()){
             val p = talkPlayer(id)
-            val update = playerTimestamp(p)?: createPlayerTimestamp(p)
+            val update = talkPlayerTimestamp(p)
             val d = Duration.between(getTimeFromUpdate(update.timestamp),LocalDateTime.now())
-            if (d >= standDuration) updatePlayer(p, d) else p
+            if (d >= standDuration) {
+                updatePlayerTimestamp(p)
+                updatePlayer(p, d)
+            } else {
+                p
+            }
         }
     }
     /**更新玩家数据，并返回更新后的对象*/
@@ -135,7 +140,6 @@ object DatabaseHelper {
             }
             newPlayer
         }
-        updatePlayerTimestamp(result)
         // 若生命值没有耗尽继续递归
         if (!result.onRemake) newUpdate(playerID,leftTime-1)
     }
@@ -162,7 +166,6 @@ object DatabaseHelper {
             }
         }
     }
-
     /**规则化玩家心情,使其值保持在  0~1  */
     private fun formatPlayerHappiness(player: Player){
         if(player.happiness in (0.0 .. 1.0)) return
@@ -174,14 +177,13 @@ object DatabaseHelper {
             }
         }
     }
-
     /**对数据库进行初始化*/
     private fun initDatabase(){
         transaction(getDatabase()) {
             SchemaUtils.createMissingTablesAndColumns(Players,PlayerUpdates)
+//            fixPlayerData()
         }
     }
-
     /**获取玩家时间戳*/
     private fun playerTimestamp(player: Player):PlayerUpdate?{
         return transaction(getDatabase()) {
@@ -209,7 +211,7 @@ object DatabaseHelper {
         return LocalDateTime.parse(timestamp, timestampFormatter)
     }
     /**更新玩家时间戳*/
-    private fun updatePlayerTimestamp(player: Player){
+    fun updatePlayerTimestamp(player: Player){
         transaction(getDatabase()){
             talkPlayerTimestamp(player).timestamp = LocalDateTime.now().format(timestampFormatter)
         }
@@ -218,6 +220,7 @@ object DatabaseHelper {
     fun now():String{
         return LocalDateTime.now().format(timestampFormatter)
     }
+    /**将带年份的字符串年份去掉*/
     fun shorter(timestamp: String):String{
         return timestamp.substring(2)
     }

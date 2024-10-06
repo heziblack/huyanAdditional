@@ -7,7 +7,7 @@ import cn.chahuyun.hibernateplus.Configuration
 import cn.chahuyun.hibernateplus.DriveType
 import cn.chahuyun.hibernateplus.HibernatePlusService
 import icu.heziblack.miraiplugin.chahuyunAdditionalItem.manager.CUSTOM_PERMS
-import icu.heziblack.miraiplugin.chahuyunAdditionalItem.service.PlayerPropsManageService
+
 import icu.heziblack.miraiplugin.chahuyunAdditionalItem.util.DatabaseHelper
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -45,7 +45,7 @@ object PluginMain : KotlinPlugin(
             meme
         """.trimIndent()
         )
-        dependsOn("cn.chahuyun.HuYanEconomy",">=1.2.0",false)
+        dependsOn("cn.chahuyun.HuYanEconomy",">=1.6.0",false)
         dependsOn("cn.chahuyun.HuYanAuthorize",">=1.1.5",false) // 使用依赖  版本需要大于等于 1.1.5 没有依赖将启动失败
         // author 和 info 可以删除.
     }
