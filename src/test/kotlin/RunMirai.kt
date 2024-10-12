@@ -1,11 +1,14 @@
 package org.example.mirai.plugin
 
 import icu.heziblack.miraiplugin.chahuyunAdditionalItem.PluginMain
+import icu.heziblack.miraiplugin.chahuyunAdditionalItem.util.PlayerDataFileReaderWriter
 import net.mamoe.mirai.alsoLogin
 import net.mamoe.mirai.console.MiraiConsole
 import net.mamoe.mirai.console.plugin.PluginManager.INSTANCE.enable
 import net.mamoe.mirai.console.plugin.PluginManager.INSTANCE.load
 import net.mamoe.mirai.console.terminal.MiraiConsoleTerminalLoader
+import java.io.File
+import java.nio.file.Paths
 import java.time.LocalDateTime
 
 suspend fun main() {
@@ -35,7 +38,12 @@ suspend fun main() {
 //    }.alsoLogin()
 //
 //    MiraiConsole.job.join()
-    val s = 1220541730L
-    val i = s.toUInt()
-    println(i)
+//    val s = 1220541730L
+//    val i = s.toUInt()
+//    println(Long.MAX_VALUE)
+    val baseDir = File(Paths.get("").toAbsolutePath().toFile(),"testPath")
+    val readerWriter = PlayerDataFileReaderWriter(baseDir)
+    readerWriter.timestampWrite("123")
+    val read = readerWriter.timestampRead("123")
+    println(read)
 }

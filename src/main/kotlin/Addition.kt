@@ -62,37 +62,25 @@ class TestManager {
         messageMatching = MessageMatchingEnum.CUSTOM,
         )
     suspend fun test2(event: GroupMessageEvent) {
-        val p = DatabaseHelper.talkPlayer(event.sender)
-        val b = DatabaseHelper.talkPlayerTimestamp(p)
-        val np = DatabaseHelper.updatePlayer(p.id.value)
-        DatabaseHelper.updatePlayerTimestamp(p)
-        val nts = DatabaseHelper.talkPlayerTimestamp(p)
-        val sb = StringBuilder()
-        sb.append("""
-            time:${DatabaseHelper.shorter(b.timestamp)}->${DatabaseHelper.shorter(nts.timestamp)}
-            HP:${ShareUtils.rounding(p.hp)}->${ShareUtils.rounding(np.hp)}
-            FD:${ShareUtils.rounding(p.food)}->${ShareUtils.rounding(np.food)}
-            HA:${ShareUtils.rounding(p.happiness)}->${ShareUtils.rounding(np.happiness)}
-            OR:${p.onRemake}->${np.onRemake}
-        """.trimIndent())
-        event.sendMessageQuery(sb.toString())
+//        val p = DatabaseHelper.talkPlayer(event.sender)
+//        val np = DatabaseHelper.updatePlayer(p.id.value)
+//        val sb = StringBuilder("Before -> after\n")
+//        sb.append("""
+//            ${p.timestamp}->${np.timestamp}
+//            ${p.food}->${np.food}
+//        """.trimIndent())
+//        event.sendMessageQuery(sb.toString())
+        DatabaseHelper.testTimestampUpdate(event.sender.id)
+//        event.sendMessageQuery("成功")
     }
 
     @MessageAuthorize(
         text = ["sjc"],
         groupPermissions = [TEST_GROUP, AuthPerm.OWNER, AuthPerm.ADMIN],
-//        custom = CustomCheck::class,
-//        messageMatching = MessageMatchingEnum.CUSTOM,
     )
     suspend fun test3(event: GroupMessageEvent) {
         val p = DatabaseHelper.talkPlayer(event.sender)
-        val b = DatabaseHelper.talkPlayerTimestamp(p)
-        val np = DatabaseHelper.updatePlayer(p.id.value)
-//        DatabaseHelper.updateTimestamp(b)
-        val sb = StringBuilder()
-        sb.append("""
-            time:${DatabaseHelper.shorter(b.timestamp)}
-        """.trimIndent())
+        val sb = StringBuilder("here is nothing to show")
         event.sendMessageQuery(sb.toString())
     }
 

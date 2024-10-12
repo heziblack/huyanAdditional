@@ -1,9 +1,12 @@
 package icu.heziblack.miraiplugin.chahuyunAdditionalItem.entity.table
 
+//import kotlinx.datetime.LocalDateTime
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.dao.id.IdTable
 import org.jetbrains.exposed.sql.Column
 import org.jetbrains.exposed.sql.and
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
 
 object Players: IdTable<ULong>() {
@@ -26,4 +29,5 @@ object Players: IdTable<ULong>() {
     val craft = uinteger("craft").default(DefaultRecordValue)
     // flag
     val onRemake = bool("on_remake").default(false)
+    val timestamp = long("ts").default(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyMMddHHmmss")).toLong())
 }

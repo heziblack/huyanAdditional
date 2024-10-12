@@ -8,7 +8,6 @@ import icu.heziblack.miraiplugin.chahuyunAdditionalItem.entity.table.Players
 import net.mamoe.mirai.contact.User
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.SchemaUtils
-import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.jetbrains.exposed.sql.update
 import java.io.File
@@ -28,9 +27,7 @@ object DatabaseHelper {
     fun dbUrl():String{
         return getDatabase().url
     }
-    /**
-     * 备份数据库文件
-     * */
+    /**备份数据库文件*/
     fun backupDataFile():Boolean{
         try{
             if (fileLocation.exists()) {
@@ -58,6 +55,9 @@ object DatabaseHelper {
     private fun getDatabase():Database{
         return Database.connect("jdbc:sqlite:${fileLocation.path}","org.sqlite.JDBC")
     }
+    /**默认数据库*/
+    private val defaultDB:Database
+        get() = Database.connect("jdbc:sqlite:${fileLocation.path}","org.sqlite.JDBC")
     /**查询创建玩家，通过用户对象*/
     fun talkPlayer(user: User): Player {
         val userInfo = UserManager.getUserInfo(user)
@@ -78,23 +78,18 @@ object DatabaseHelper {
     fun updatePlayer(id:ULong):Player{
         return transaction(getDatabase()){
             val p = talkPlayer(id)
-            val update = talkPlayerTimestamp(p)
-            val d = Duration.between(getTimeFromUpdate(update.timestamp),LocalDateTime.now())
+            val update = p.timestamp
+            val d = Duration.between(getTimeFromTimestamp(update), LocalDateTime.now())
             if (d >= standDuration) {
-                updatePlayerTimestamp(p)
-                updatePlayer(p, d)
+                println("超时")
+                recursionUpdate(p.id.value,d.toMinutes()/5)
+                p.timestamp = now()
+                talkPlayer(p.id.value)
             } else {
+                println("未超时")
                 p
             }
         }
-    }
-    /**更新玩家数据，并返回更新后的对象*/
-    private fun updatePlayer(player: Player,duration: Duration):Player{
-        val minutes = duration.toMinutes() //分钟数
-        val counter = minutes / 5
-        newUpdate(player.id.value, counter)
-        // 返回更新数据后的玩家对象
-        return talkPlayer(player.id.value)
     }
     /**使用递归来更新玩家数据
      *
@@ -102,13 +97,12 @@ object DatabaseHelper {
      *
      * @param playerID 玩家ID，用于查询玩家对象，每次递归计算通过其重新获取玩家
      * @param leftTime 剩余循环次数 */
-    private fun newUpdate(playerID:ULong, leftTime:Long){
+    private fun recursionUpdate(playerID:ULong, leftTime:Long){
         // 若次数耗尽结束递归
         if (leftTime<=0) return
-
         val result =  transaction(getDatabase()) {
             // 重新查询玩家数据，以防万一
-            val newPlayer = Player.findById(playerID)?: talkPlayer(playerID)
+            val newPlayer = talkPlayer(playerID)
             // 检查、修改玩家食物属性
             if (newPlayer.food > 0.0){
                 if (newPlayer.food > FOOD_DEVALUE){
@@ -141,9 +135,16 @@ object DatabaseHelper {
             newPlayer
         }
         // 若生命值没有耗尽继续递归
-        if (!result.onRemake) newUpdate(playerID,leftTime-1)
+        if (!result.onRemake) recursionUpdate(playerID,leftTime-1)
     }
-
+    /***/
+    private fun cycleUpdate(playerID: ULong, counter:Long){
+        transaction(defaultDB) {
+            for (c in (0..counter)){
+                // TODO '看情况写不写吧'
+            }
+        }
+    }
     /**根据[happiness]分段决定扣除的hp值
      *
      * 未来或许会修改*/
@@ -190,46 +191,38 @@ object DatabaseHelper {
             PlayerUpdate.findById(player.id)
         }
     }
-    /**创建玩家时间戳*/
-    private fun createPlayerTimestamp(player: Player):PlayerUpdate{
-        return transaction(getDatabase()) {
-            PlayerUpdate.new(id = player.id.value){
-                this.timestamp = LocalDateTime.now().format(timestampFormatter)
-            }
-        }
-    }
-    /**获取创建玩家时间戳*/
-    fun talkPlayerTimestamp(player: Player):PlayerUpdate{
-        return playerTimestamp(player)?: createPlayerTimestamp(player)
-    }
     /**更新间隔颗粒度*/
     private val standDuration = Duration.ofMinutes(5L)
     /**日期格式化为字符*/
     private val timestampFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("yyMMddHHmmss")
-    /**从字符串获取时间*/
-    private fun getTimeFromUpdate(timestamp:String):LocalDateTime{
-        return LocalDateTime.parse(timestamp, timestampFormatter)
-    }
-    /**更新玩家时间戳*/
-    fun updatePlayerTimestamp(player: Player){
-        transaction(getDatabase()){
-            talkPlayerTimestamp(player).timestamp = LocalDateTime.now().format(timestampFormatter)
-        }
+    /**从时间戳获取时间*/
+    private fun getTimeFromTimestamp(timestamp:Long):LocalDateTime{
+        return LocalDateTime.parse(timestamp.toString(), timestampFormatter)
     }
     /**获取当前时间时间戳字符串*/
-    fun now():String{
-        return LocalDateTime.now().format(timestampFormatter)
+    private fun now():Long{
+        return LocalDateTime.now().format(timestampFormatter).toLong()
     }
     /**将带年份的字符串年份去掉*/
     fun shorter(timestamp: String):String{
         return timestamp.substring(2)
     }
+    /**将带年份的时间戳年份去掉*/
+    fun shorter(timestamp:Long):String{
+        return shorter(timestamp.toString())
+    }
     /**补全玩家数据*/
     fun fixPlayerData(){
         transaction(getDatabase()) {
-            for(p in Player.all()){
-                talkPlayerTimestamp(p)
+            Players.update {
+
             }
+        }
+    }
+    fun testTimestampUpdate(id:Long){
+        transaction(defaultDB){
+            val p = talkPlayer(id)
+            p.timestamp = now()
         }
     }
 }

@@ -7,5 +7,5 @@ import org.jetbrains.exposed.sql.ReferenceOption
 
 object PlayerUpdates: IdTable<ULong>() {
     override val id: Column<EntityID<ULong>> = reference("p_id",Players.id, onDelete = ReferenceOption.CASCADE)
-    val timestamp = varchar("timestamp",24)
+    val timestamp = long("timestamp")
 }

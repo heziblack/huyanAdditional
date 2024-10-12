@@ -27,4 +27,5 @@ class Player(id:EntityID<ULong>):Entity<ULong>(id) {
     var craft by Players.craft
 
     var onRemake by Players.onRemake
+    var timestamp by Players.timestamp
 }
