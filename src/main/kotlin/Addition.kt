@@ -56,22 +56,23 @@ class TestManager {
     }
 
     @MessageAuthorize(
-//        text = ["测试"],
+        text = ["测试"],
         groupPermissions = [TEST_GROUP, AuthPerm.OWNER, AuthPerm.ADMIN],
-        custom = CustomCheck::class,
-        messageMatching = MessageMatchingEnum.CUSTOM,
+//        custom = CustomCheck::class,
+        messageMatching = MessageMatchingEnum.TEXT,
         )
     suspend fun test2(event: GroupMessageEvent) {
-//        val p = DatabaseHelper.talkPlayer(event.sender)
-//        val np = DatabaseHelper.updatePlayer(p.id.value)
-//        val sb = StringBuilder("Before -> after\n")
-//        sb.append("""
-//            ${p.timestamp}->${np.timestamp}
-//            ${p.food}->${np.food}
-//        """.trimIndent())
-//        event.sendMessageQuery(sb.toString())
-        DatabaseHelper.testTimestampUpdate(event.sender.id)
+        val p = DatabaseHelper.talkPlayer(event.sender)
+        val np = DatabaseHelper.updatePlayer(p.id.value)
+        val sb = StringBuilder("Before -> after\n")
+        sb.append("""
+            hp:${p.hp}->${np.hp}
+            fd:${p.food}->${np.food}
+        """.trimIndent())
+        event.sendMessageQuery(sb.toString())
+//        DatabaseHelper.testTimestampUpdate(event.sender.id)
 //        event.sendMessageQuery("成功")
+
     }
 
     @MessageAuthorize(

@@ -77,26 +77,33 @@ object DatabaseHelper {
     /**更新玩家数据*/
     fun updatePlayer(id:ULong):Player{
         return transaction(getDatabase()){
-            val p = talkPlayer(id)
-            val update = p.timestamp
-            val d = Duration.between(getTimeFromTimestamp(update), LocalDateTime.now())
+            val p = talkPlayer(id)                                                              // 获取玩家实体
+            val timestampChecker = PlayerDataFileReaderWriter(fileLocation.parentFile)          // 生成时间戳读写器
+            val update = timestampChecker.timestampRead(id.toString()).toLong()                 // 读取时间戳
+            val d = Duration.between(getTimeFromTimestamp(update), LocalDateTime.now())         // 计算时间差
             if (d >= standDuration) {
+                // 超时流程
                 println("超时")
-                recursionUpdate(p.id.value,d.toMinutes()/5)
-                p.timestamp = now()
-                talkPlayer(p.id.value)
+                recursionUpdate(p.id.value,d.toMinutes()/5)                             // 核心循环更新
+                timestampChecker.timestampWrite(id.toString())                                  // 写入新时间
+                talkPlayer(p.id.value)                                                          // 查询更新后的玩家实体
             } else {
+                // 未超时流程
                 println("未超时")
-                p
+                p                                                                               // 返回没有操作过的玩家实体
             }
         }
     }
-    /**使用递归来更新玩家数据
+    /**需要重构！使用单次赋值的方法进行修改！循环多次赋值有数据库方面的问题！
+     *
+     * 使用递归来更新玩家数据
      *
      * 调用此方法前必须保证[Player]和[PlayerUpdate]数据存在
      *
      * @param playerID 玩家ID，用于查询玩家对象，每次递归计算通过其重新获取玩家
-     * @param leftTime 剩余循环次数 */
+     * @param leftTime 剩余循环次数
+     *
+     * */
     private fun recursionUpdate(playerID:ULong, leftTime:Long){
         // 若次数耗尽结束递归
         if (leftTime<=0) return
@@ -136,14 +143,6 @@ object DatabaseHelper {
         }
         // 若生命值没有耗尽继续递归
         if (!result.onRemake) recursionUpdate(playerID,leftTime-1)
-    }
-    /***/
-    private fun cycleUpdate(playerID: ULong, counter:Long){
-        transaction(defaultDB) {
-            for (c in (0..counter)){
-                // TODO '看情况写不写吧'
-            }
-        }
     }
     /**根据[happiness]分段决定扣除的hp值
      *
